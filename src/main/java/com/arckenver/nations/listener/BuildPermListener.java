@@ -18,15 +18,43 @@ import org.spongepowered.api.world.World;
 import com.arckenver.nations.ConfigHandler;
 import com.arckenver.nations.DataHandler;
 import com.arckenver.nations.LanguageHandler;
+import com.arckenver.nations.NationsPlugin;
+import com.arckenver.nations.Utils;
 
 public class BuildPermListener
 {
+
+	@Listener(order=Order.FIRST, beforeModifications = true)
+	public void onPlayerModifyBlock(ChangeBlockEvent.Modify event, @First Player player)
+	{
+		if (player.hasPermission("nations.admin.bypass.perm.build"))
+		{
+			return;
+		}
+		event
+		.getTransactions()
+		.stream()
+		.forEach(trans -> trans.getOriginal().getLocation().ifPresent(loc -> {
+			if (ConfigHandler.getNode("worlds").getNode(trans.getFinal().getLocation().get().getExtent().getName()).getNode("enabled").getBoolean()
+					&& !ConfigHandler.isWhitelisted("build", trans.getFinal().getState().getType().getId())
+					&& !DataHandler.getPerm("build", player.getUniqueId(), loc))
+			{
+				trans.setValid(false);
+				try {
+					player.sendMessage(Text.of(TextColors.RED, LanguageHandler.ERROR_PERM_BUILD));
+				} catch (Exception e) {}
+			}
+		}));
+	}
 
 	@Listener(order=Order.FIRST, beforeModifications = true)
 	public void onPlayerChangeBlock(ChangeBlockEvent.Pre event, @First Player player)
 	{
 		if (player.hasPermission("nations.admin.bypass.perm.build"))
 		{
+			return;
+		}
+		if (Utils.isFakePlayer(event)) {
 			return;
 		}
 		for (Location<World> loc : event.getLocations()) {
@@ -67,9 +95,11 @@ public class BuildPermListener
 	}
 
 	@Listener(order=Order.FIRST, beforeModifications = true)
-	public void onPlayerBreaksBlock(ChangeBlockEvent.Break event, @First Player player)
+	public void onPlayerBreaksBlock(ChangeBlockEvent.Break event)
 	{
-		if (player.hasPermission("nations.admin.bypass.perm.build"))
+		User user = Utils.getUser(event);
+
+		if (user != null && user.hasPermission("nations.admin.bypass.perm.build"))
 		{
 			return;
 		}
@@ -78,13 +108,17 @@ public class BuildPermListener
 		.stream()
 		.forEach(trans -> trans.getOriginal().getLocation().ifPresent(loc -> {
 			if (!ConfigHandler.isWhitelisted("break", trans.getFinal().getState().getType().getId())
-					&& ConfigHandler.getNode("worlds").getNode(trans.getFinal().getLocation().get().getExtent().getName()).getNode("enabled").getBoolean()
-					&& !DataHandler.getPerm("build", player.getUniqueId(), loc))
+					&& ConfigHandler.getNode("worlds").getNode(trans.getFinal().getLocation().get().getExtent().getName()).getNode("enabled").getBoolean())
 			{
-				trans.setValid(false);
-				try {
-					player.sendMessage(Text.of(TextColors.RED, LanguageHandler.ERROR_PERM_BUILD));
-				} catch (Exception e) {}
+				if (user == null || !DataHandler.getPerm("build", user.getUniqueId(), loc))
+				{
+					trans.setValid(false);
+					if (user != null && user instanceof Player) {
+						try {
+							((Player) user).sendMessage(Text.of(TextColors.RED, LanguageHandler.ERROR_PERM_BUILD));
+						} catch (Exception e) {}
+					}
+				}
 			}
 		}));
 	}
@@ -109,22 +143,20 @@ public class BuildPermListener
 	@Listener(order=Order.FIRST, beforeModifications = true)
 	public void onEntitySpawn(SpawnEntityEvent event, @First Player player)
 	{
-		for (Entity e : event.getEntities())
+		if (player.hasPermission("nations.admin.bypass.perm.build"))
 		{
-			if (!ConfigHandler.getNode("worlds").getNode(e.getWorld().getName()).getNode("enabled").getBoolean())
-			{
-				return;
-			}
-			if (player.hasPermission("nations.admin.bypass.perm.build"))
-			{
-				return;
-			}
-			if (event.getCause().contains(SpawnTypes.PLACEMENT))
-			{
-				try {
-					if (!DataHandler.getPerm("build", player.getUniqueId(), e.getLocation()))
-						event.setCancelled(true);
-				} catch (IndexOutOfBoundsException ex) {}
+			return;
+		}
+		if (event.getCause().contains(SpawnTypes.PLACEMENT))
+		{
+			try {
+				if (!ConfigHandler.getNode("worlds").getNode(event.getEntities().get(0).getWorld().getName()).getNode("enabled").getBoolean())
+					return;
+				if (!ConfigHandler.isWhitelisted("spawn", event.getEntities().get(0).getType().getId())
+						&& !DataHandler.getPerm("build", player.getUniqueId(), event.getEntities().get(0).getLocation()))
+					event.setCancelled(true);
+			} catch (IndexOutOfBoundsException e) {
+				NationsPlugin.getLogger().warn("index out of bounds in handling entity spawn from player " + player);
 			}
 		}
 	}

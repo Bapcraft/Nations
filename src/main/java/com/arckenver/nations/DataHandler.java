@@ -168,20 +168,20 @@ public class DataHandler
 				return nation;
 			}
 		}
-//		for (Entry<Vector2i, ArrayList<Nation>> e : worldChunks.get(loc.getExtent().getUniqueId()).entrySet())
-//		{
-//			if (e.getKey().equals(new Vector2i(IntMath.divide(loc.getBlockX(), 16, RoundingMode.FLOOR), IntMath.divide(loc.getBlockZ(), 16, RoundingMode.FLOOR))))
-//			{
-//				for (Nation nation : e.getValue())
-//				{
-//					if (nation.getRegion().isInside(loc))
-//					{
-//						return nation;
-//					}
-//				}
-//				return null;
-//			}
-//		}
+		//		for (Entry<Vector2i, ArrayList<Nation>> e : worldChunks.get(loc.getExtent().getUniqueId()).entrySet())
+		//		{
+		//			if (e.getKey().equals(new Vector2i(IntMath.divide(loc.getBlockX(), 16, RoundingMode.FLOOR), IntMath.divide(loc.getBlockZ(), 16, RoundingMode.FLOOR))))
+		//			{
+		//				for (Nation nation : e.getValue())
+		//				{
+		//					if (nation.getRegion().isInside(loc))
+		//					{
+		//						return nation;
+		//					}
+		//				}
+		//				return null;
+		//			}
+		//		}
 		return null;
 	}
 
