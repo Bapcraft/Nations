@@ -1,5 +1,6 @@
 package com.arckenver.nations.listener;
 
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
@@ -108,20 +109,23 @@ public class BuildPermListener
 	@Listener(order=Order.FIRST, beforeModifications = true)
 	public void onEntitySpawn(SpawnEntityEvent event, @First Player player)
 	{
-		if (!ConfigHandler.getNode("worlds").getNode(event.getEntities().get(0).getWorld().getName()).getNode("enabled").getBoolean())
+		for (Entity e : event.getEntities())
 		{
-			return;
-		}
-		if (player.hasPermission("nations.admin.bypass.perm.build"))
-		{
-			return;
-		}
-		if (event.getCause().contains(SpawnTypes.PLACEMENT))
-		{
-			try {
-				if (!DataHandler.getPerm("build", player.getUniqueId(), event.getEntities().get(0).getLocation()))
-					event.setCancelled(true);
-			} catch (IndexOutOfBoundsException e) {}
+			if (!ConfigHandler.getNode("worlds").getNode(e.getWorld().getName()).getNode("enabled").getBoolean())
+			{
+				return;
+			}
+			if (player.hasPermission("nations.admin.bypass.perm.build"))
+			{
+				return;
+			}
+			if (event.getCause().contains(SpawnTypes.PLACEMENT))
+			{
+				try {
+					if (!DataHandler.getPerm("build", player.getUniqueId(), e.getLocation()))
+						event.setCancelled(true);
+				} catch (IndexOutOfBoundsException ex) {}
+			}
 		}
 	}
 }
