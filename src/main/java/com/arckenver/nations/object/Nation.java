@@ -145,7 +145,19 @@ public class Nation
 
 	public double getUpkeep()
 	{
-		return ConfigHandler.getNode("prices", "upkeepPerCitizen").getDouble() * citizens.size();
+		double upkeepPerCitizen = ConfigHandler.getNode("prices", "upkeepPerCitizen").getDouble();
+		double upkeepPerSpawn = ConfigHandler.getNode("prices", "upkeepPerSpawn").getDouble();
+		int blocksPerCitizen = ConfigHandler.getNode("others", "blocksPerCitizen").getInt();
+		double extraBlockMult = ConfigHandler.getNode("prices", "upkeepPerExtraBlockMult").getDouble();
+		double extraBlockExp = ConfigHandler.getNode("prices", "upkeepPerExtraBlockMult").getDouble();
+
+		double citizenCost = upkeepPerCitizen * citizens.size();
+		double spawnCost = upkeepPerSpawn * this.getNumSpawns();
+
+		int extraBlocksInUse = this.region.size() - this.getNumCitizens() * blocksPerCitizen;
+		double extraBlockCost = Math.max(extraBlockMult * Math.pow(extraBlocksInUse, extraBlockExp), 0);
+
+		return citizenCost + spawnCost + extraBlockCost;
 	}
 
 	public Location<World> getSpawn(String name)

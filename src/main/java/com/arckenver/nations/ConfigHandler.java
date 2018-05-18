@@ -63,6 +63,9 @@ public class ConfigHandler
 		Utils.ensurePositiveNumber(config.getNode("prices", "extraPrice"), 0.5);
 		Utils.ensurePositiveNumber(config.getNode("prices", "blockClaimPrice"), 0.3);
 		Utils.ensurePositiveNumber(config.getNode("prices", "outpostCreationPrice"), 1000);
+		Utils.ensurePositiveNumber(config.getNode("prices", "upkeepPerSpawn"), 50);
+		Utils.ensurePositiveNumber(config.getNode("prices", "upkeepPerExtraBlockMult"), 0.5);
+		Utils.ensurePositiveNumber(config.getNode("prices", "upkeepPerExtraBlockExp"), 1);
 
 		Utils.ensurePositiveNumber(config.getNode("others", "blocksPerCitizen"), 1000);
 		Utils.ensurePositiveNumber(config.getNode("others", "maxNationSpawns"), 3);
@@ -74,13 +77,13 @@ public class ConfigHandler
 		Utils.ensurePositiveNumber(config.getNode("others", "maxNationTagLength"), 5);
 		Utils.ensurePositiveNumber(config.getNode("others", "minZoneNameLength"), 3);
 		Utils.ensurePositiveNumber(config.getNode("others", "maxZoneNameLength"), 13);
+
 		Utils.ensureBoolean(config.getNode("others", "enableNationRanks"), true);
 		Utils.ensureBoolean(config.getNode("others", "enableNationTag"), true);
 		Utils.ensureBoolean(config.getNode("others", "enableGoldenAxe"), true);
 		Utils.ensureString(config.getNode("others", "publicChatFormat"), " &r[&3{NATION}&r] &5{TITLE} &r");
 		Utils.ensureString(config.getNode("others", "nationChatFormat"), " &r{&eNC&r} ");
 		Utils.ensureString(config.getNode("others", "nationSpyChatTag"), " &r[&cSPY&r]");
-
 
 		Utils.ensureString(config.getNode("toast", "wild"), "&2{WILD} &7- {FORMATPVP}");
 		Utils.ensureString(config.getNode("toast", "nation"), "&3{NATION}{FORMATPRESIDENT} &7- {FORMATPVP}");
@@ -92,7 +95,6 @@ public class ConfigHandler
 		Utils.ensureString(config.getNode("toast", "formatZonePrice"), "&e[{ARG}] &7-");
 		Utils.ensureString(config.getNode("toast", "formatPvp"), "&4({ARG})");
 		Utils.ensureString(config.getNode("toast", "formatNoPvp"), "&2({ARG})");
-
 
 		Utils.ensureBoolean(config.getNode("nations", "canEditTaxes"), true);
 		Utils.ensurePositiveNumber(config.getNode("nations", "defaultTaxes"), 50);
